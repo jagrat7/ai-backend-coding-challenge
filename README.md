@@ -62,3 +62,4 @@ erDiagram
 - better service names
 - better tov storage
 - additonal company config
+- improve sqeuence abstraction
