@@ -1,5 +1,5 @@
 # LinkedIn Messaging Sequence Generator
-
+![App Screenshot](public/Screenshot_2026-01-05_04-28-24.png)
 ## Database Schema
 
 ```mermaid
@@ -58,9 +58,11 @@ erDiagram
 ## Future Improvements/Changes
 
 - Puppeteer/playwright based scraper with docker compose and railway deployment instead of vercel
-- better UI
 - better service names
 - better tov storage
+- better heuristic for message quality
 - additonal company config
 - improve sqeuence abstraction
 - add users
+- add prompt caching
+- overall refactors

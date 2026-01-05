@@ -19,7 +19,7 @@ export const tovConfigs = pgTable("tov_configs", (d) => ({
 
 export const companies = pgTable("companies", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
-  context: d.text(),
+  context: d.text().notNull().unique(),
   ...timestamps,
 }));
 

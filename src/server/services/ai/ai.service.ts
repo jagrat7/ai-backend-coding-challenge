@@ -5,8 +5,13 @@ import {
   generateSystemMessage,
   generateUserMessage,
 } from "./prompts/sequence.prompt";
-import type { GenerateMessagesInput, GenerateMessagesResult } from "./types";
+import type {
+  GenerateMessagesInput,
+  GenerateMessagesResult,
+  GeneratedMessage,
+} from "./types";
 import type { IAiService } from "./ai.interface";
+import type { LinkedInProfile } from "../linkedin/types";
 
 export class AiService implements IAiService {
   private readonly MODEL = "google/gemini-3-flash";
@@ -23,6 +28,57 @@ export class AiService implements IAiService {
     const outputCost =
       (completionTokens / 1_000_000) * this.COST_PER_MILLION_OUTPUT;
     return inputCost + outputCost;
+  }
+
+  scoreMessage(body: string, profile: LinkedInProfile): GeneratedMessage {
+    const lowerBody = body.toLowerCase();
+    let score = 0;
+
+    // Check for name mention (+0.15)
+    const name = profile.fullName ?? `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim();
+    if (name && lowerBody.includes(name.toLowerCase().split(" ")[0] ?? "")) {
+      score += 0.15;
+    }
+
+    // Check for company mention (+0.2)
+    const currentCompany = profile.experience?.[0]?.company_name;
+    if (currentCompany && lowerBody.includes(currentCompany.toLowerCase())) {
+      score += 0.2;
+    }
+
+    // Check for role/title mention (+0.1)
+    const currentTitle = profile.experience?.[0]?.title;
+    if (currentTitle && lowerBody.includes(currentTitle.toLowerCase())) {
+      score += 0.1;
+    }
+
+    // Check for headline keywords (+0.1)
+    if (profile.headline) {
+      const headlineWords = profile.headline.toLowerCase().split(/\s+/).filter((w) => w.length > 4);
+      const matchedWords = headlineWords.filter((word) => lowerBody.includes(word));
+      if (matchedWords.length > 0) {
+        score += Math.min(0.1, matchedWords.length * 0.03);
+      }
+    }
+
+    // Check for word count in target range 50-150 (+0.2)
+    const wordCount = body.split(/\s+/).length;
+    if (wordCount >= 50 && wordCount <= 150) {
+      score += 0.2;
+    } else if (wordCount >= 30 && wordCount <= 200) {
+      score += 0.1;
+    }
+
+    // Check for clear CTA indicators (+0.25)
+    const ctaPatterns = ["let's", "would you", "can we", "interested in", "schedule", "connect", "chat", "call"];
+    if (ctaPatterns.some((pattern) => lowerBody.includes(pattern))) {
+      score += 0.25;
+    }
+
+    return {
+      body,
+      confidence: Math.min(1, Math.round(score * 100) / 100),
+    };
   }
 
 
@@ -46,13 +102,6 @@ export class AiService implements IAiService {
                   .string()
                   .describe(
                     "The personalized outreach message body, 50-150 words, with clear call-to-action",
-                  ),
-                confidence: z
-                  .number()
-                  .min(0)
-                  .max(1)
-                  .describe(
-                    "Confidence score (0-1) based on personalization quality and relevance to prospect profile",
                   ),
               }),
             )
@@ -86,8 +135,13 @@ export class AiService implements IAiService {
       const totalTokens = usage.totalTokens ?? 0;
       const costUsd = this.calculateCost(promptTokens, completionTokens);
 
+      const confidenceScores = object.messages.map((msg) =>
+        this.scoreMessage(msg.body, input.profile).confidence,
+      );
+
       return {
         messages: object.messages,
+        confidenceScores,
         thinkingProcess: reasoning ?? "",
         prompt: fullPrompt,
         metadata: {

@@ -31,7 +31,8 @@ export interface AiGenerationMetadata {
 }
 
 export interface GenerateMessagesResult {
-  messages: GeneratedMessage[];
+  messages: Array<{ body: string }>;
+  confidenceScores: number[];
   thinkingProcess: string;
   prompt: string;
   metadata: AiGenerationMetadata;

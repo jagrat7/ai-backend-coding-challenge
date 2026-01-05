@@ -47,7 +47,7 @@ export class SequenceService implements ISequenceService {
     const aiResult = await aiService.generateMessages({
       profile: prospect.profileData as LinkedInProfile,
       company: {
-        context: company.context ?? "",
+        context: company.context,
       },
       tovConfig: {
         formality: Number(tovConfig.formality),
@@ -75,10 +75,10 @@ export class SequenceService implements ISequenceService {
     const messageRecords = await db
       .insert(messages)
       .values(
-        aiResult.messages.map((msg) => ({
+        aiResult.messages.map((msg, index) => ({
           sequenceId: sequence.id,
           body: msg.body,
-          confidence: msg.confidence.toString(),
+          confidence: aiResult.confidenceScores[index]?.toString() ?? "0",
         })),
       )
       .returning();

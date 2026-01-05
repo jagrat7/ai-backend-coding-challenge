@@ -16,13 +16,20 @@ export const sequenceRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      // Create company
-      const [company] = await ctx.db
-        .insert(companies)
-        .values({
-          context: input.companyContext,
-        })
-        .returning();
+      // Get or create company
+      let company = await ctx.db.query.companies.findFirst({
+        where: (companies, { eq }) => eq(companies.context, input.companyContext),
+      });
+
+      if (!company) {
+        const [newCompany] = await ctx.db
+          .insert(companies)
+          .values({
+            context: input.companyContext,
+          })
+          .returning();
+        company = newCompany;
+      }
 
       // Create TOV config
       const [tovConfig] = await ctx.db
