@@ -36,6 +36,7 @@ export class LinkedInService implements ILinkedInService {
     apiUrl.searchParams.append("api_key", env.SCRAPINGDOG_API_KEY);
     apiUrl.searchParams.append("type", "profile");
     apiUrl.searchParams.append("id", linkedinId);
+    apiUrl.searchParams.append("premium", "true");
 
     const response = await fetch(apiUrl.toString());
 
