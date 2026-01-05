@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { sequenceService } from "~/server/services/sequence/sequence.service";
-import { db } from "~/server/db";
 import { companies, tovConfigs } from "~/server/db/schema";
 
 export const sequenceRouter = createTRPCRouter({
@@ -16,9 +15,9 @@ export const sequenceRouter = createTRPCRouter({
         directness: z.number().min(0).max(1).default(0.5),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       // Create company
-      const [company] = await db
+      const [company] = await ctx.db
         .insert(companies)
         .values({
           context: input.companyContext,
@@ -26,7 +25,7 @@ export const sequenceRouter = createTRPCRouter({
         .returning();
 
       // Create TOV config
-      const [tovConfig] = await db
+      const [tovConfig] = await ctx.db
         .insert(tovConfigs)
         .values({
           name: `Generated ${new Date().toISOString()}`,

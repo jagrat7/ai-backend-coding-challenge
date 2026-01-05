@@ -47,7 +47,15 @@ export class LinkedInService implements ILinkedInService {
     }
 
     const data = (await response.json()) as unknown;
-    const profile = linkedInProfileSchema.parse(data);
+    
+    // Handle case where API returns an array instead of object
+    const profileData = Array.isArray(data) ? data[0] : data;
+    
+    if (!profileData) {
+      throw new Error("No profile data returned from Scrapingdog API");
+    }
+    
+    const profile = linkedInProfileSchema.parse(profileData);
 
     return {
       linkedinId,
