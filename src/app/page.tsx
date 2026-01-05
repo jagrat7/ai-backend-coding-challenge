@@ -1,5 +1,5 @@
-import { LinkedInScraperForm } from "~/app/_components/linkedin-scraper-form"
-import { HydrateClient } from "~/trpc/server"
+import { LinkedInScraperForm } from "~/app/_components/linkedin-scraper-form";
+import { HydrateClient } from "~/trpc/server";
 
 export default function Home() {
   return (
@@ -9,10 +9,10 @@ export default function Home() {
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
             LinkedIn <span className="text-[hsl(280,100%,70%)]">Scraper</span>
           </h1>
-          
+
           <LinkedInScraperForm />
         </div>
       </main>
     </HydrateClient>
-  )
+  );
 }

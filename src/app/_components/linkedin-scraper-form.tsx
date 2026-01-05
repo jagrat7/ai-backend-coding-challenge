@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { api } from "~/trpc/react"
-import type { LinkedInProfile } from "~/server/api/routers/linkedin"
+import { useState } from "react";
+import { api } from "~/trpc/react";
+import type { LinkedInProfile } from "~/server/api/routers/linkedin";
 
 export function LinkedInScraperForm() {
-  const [url, setUrl] = useState("")
+  const [url, setUrl] = useState("");
   const [result, setResult] = useState<{
-    success: boolean
-    linkedinId: string
-    profile: LinkedInProfile
-  } | null>(null)
+    success: boolean;
+    linkedinId: string;
+    profile: LinkedInProfile;
+  } | null>(null);
 
   const scrapeProfile = api.linkedin.scrapeProfile.useMutation({
     onSuccess: (data) => {
-      setResult(data)
+      setResult(data);
     },
-  })
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setResult(null)
-    scrapeProfile.mutate({ url })
-  }
+    e.preventDefault();
+    setResult(null);
+    scrapeProfile.mutate({ url });
+  };
 
   return (
     <div className="w-full max-w-2xl">
@@ -52,7 +52,7 @@ export function LinkedInScraperForm() {
       </form>
 
       {scrapeProfile.error && (
-        <div className="mt-6 rounded-lg bg-red-500/20 border border-red-500/50 p-4">
+        <div className="mt-6 rounded-lg border border-red-500/50 bg-red-500/20 p-4">
           <p className="font-semibold text-red-200">Error:</p>
           <p className="text-red-100">{scrapeProfile.error.message}</p>
         </div>
@@ -61,7 +61,7 @@ export function LinkedInScraperForm() {
       {result && (
         <div className="mt-6 rounded-lg bg-white/10 p-6">
           <h2 className="mb-4 text-2xl font-bold">Profile Data</h2>
-          
+
           <div className="space-y-4">
             <div>
               <p className="text-sm text-white/60">LinkedIn ID</p>
@@ -96,35 +96,45 @@ export function LinkedInScraperForm() {
               </div>
             )}
 
-            {result.profile.experience && result.profile.experience.length > 0 && (
-              <div>
-                <p className="text-sm text-white/60 mb-2">Experience</p>
-                <div className="space-y-3">
-                  {result.profile.experience.map((exp, idx) => (
-                    <div key={idx} className="rounded bg-white/5 p-3">
-                      <p className="font-semibold">{exp.title}</p>
-                      <p className="text-white/80">{exp.company}</p>
-                      {exp.duration && <p className="text-sm text-white/60">{exp.duration}</p>}
-                    </div>
-                  ))}
+            {result.profile.experience &&
+              result.profile.experience.length > 0 && (
+                <div>
+                  <p className="mb-2 text-sm text-white/60">Experience</p>
+                  <div className="space-y-3">
+                    {result.profile.experience.map((exp, idx) => (
+                      <div key={idx} className="rounded bg-white/5 p-3">
+                        <p className="font-semibold">{exp.title}</p>
+                        <p className="text-white/80">{exp.company}</p>
+                        {exp.duration && (
+                          <p className="text-sm text-white/60">
+                            {exp.duration}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {result.profile.education && result.profile.education.length > 0 && (
-              <div>
-                <p className="text-sm text-white/60 mb-2">Education</p>
-                <div className="space-y-3">
-                  {result.profile.education.map((edu, idx) => (
-                    <div key={idx} className="rounded bg-white/5 p-3">
-                      <p className="font-semibold">{edu.school}</p>
-                      {edu.degree && <p className="text-white/80">{edu.degree}</p>}
-                      {edu.field && <p className="text-white/80">{edu.field}</p>}
-                    </div>
-                  ))}
+            {result.profile.education &&
+              result.profile.education.length > 0 && (
+                <div>
+                  <p className="mb-2 text-sm text-white/60">Education</p>
+                  <div className="space-y-3">
+                    {result.profile.education.map((edu, idx) => (
+                      <div key={idx} className="rounded bg-white/5 p-3">
+                        <p className="font-semibold">{edu.school}</p>
+                        {edu.degree && (
+                          <p className="text-white/80">{edu.degree}</p>
+                        )}
+                        {edu.field && (
+                          <p className="text-white/80">{edu.field}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             <details className="mt-4">
               <summary className="cursor-pointer text-sm text-white/60 hover:text-white/80">
@@ -138,5 +148,5 @@ export function LinkedInScraperForm() {
         </div>
       )}
     </div>
-  )
+  );
 }
