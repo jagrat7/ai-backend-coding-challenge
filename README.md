@@ -155,7 +155,8 @@ Converts numeric TOV values (0-1) into natural language instructions:
 **Service Layer Architecture**
 - `AiService` class encapsulates all AI logic
 - Interface-based design (`IAiService`) enables testing and future provider swaps
-- **Why**: Decouples AI provider from business logic, making it easy to switch from Gemini to GPT-4 or Claude
+- Use of vercel AI gateway for reliable API routing, monitoring, and error handling
+- **Why**: Decouples AI provider from business logic
 
 **Structured Output with Zod**
 ```typescript
@@ -213,12 +214,13 @@ z.object({
 
 ### Future Improvements/Changes
 
-- Puppeteer/playwright based scraper with docker compose and railway deployment instead of vercel
-- better service names
-- better tov storage
-- better heuristic for message quality
-- additonal company config
-- improve sqeuence abstraction
-- add users
-- add prompt caching
-- overall refactors
+1. Custom reasoning/thinking step instead of relying on model's internal thinking
+2. Puppeteer/playwright based scraper with docker compose and railway deployment instead of vercel
+3. Better heuristic for message quality
+4. Better service names
+5. Improve sequence abstraction
+6. Better tov storage
+7. Add prompt caching
+8. Overall refactors
+9. Add users
+10. Additional company config

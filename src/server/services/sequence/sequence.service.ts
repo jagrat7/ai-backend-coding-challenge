@@ -102,6 +102,7 @@ export class SequenceService implements ISequenceService {
         body: msg.body,
         confidence: msg.confidence ? Number(msg.confidence) : null,
       })),
+      thinkingProcess: aiResult.thinkingProcess,
     };
   }
 }

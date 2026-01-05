@@ -13,4 +13,5 @@ export interface GenerateSequenceResult {
     body: string;
     confidence: number | null;
   }>;
+  thinkingProcess: string;
 }

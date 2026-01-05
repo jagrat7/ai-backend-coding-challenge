@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, Controller } from "react-hook-form"
 import { z } from "zod"
-import { api } from "~/trpc/react"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Textarea } from "~/components/ui/textarea"
@@ -22,9 +21,14 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-export function SequenceGeneratorForm() {
-  const generateSequence = api.sequence.generate.useMutation()
+interface SequenceGeneratorFormProps {
+  mutation: {
+    mutateAsync: (data: FormData) => Promise<unknown>
+    isPending: boolean
+  }
+}
 
+export function SequenceGeneratorForm({ mutation: generateSequence }: SequenceGeneratorFormProps) {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,8 +55,7 @@ export function SequenceGeneratorForm() {
   const directness = form.watch("directness")
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <Card>
+    <Card>
         <CardHeader>
           <CardTitle>Generate Outreach Sequence</CardTitle>
           <CardDescription>
@@ -231,48 +234,5 @@ export function SequenceGeneratorForm() {
           </form>
         </CardContent>
       </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Generated Messages</CardTitle>
-          <CardDescription>
-            Your personalized outreach sequence will appear here
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {generateSequence.isPending && (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          )}
-
-          {generateSequence.data && (
-            <div className="space-y-4">
-              {generateSequence.data.messages.map((msg, idx) => (
-                <Card key={msg.id}>
-                  <CardHeader>
-                    <CardTitle className="text-sm">Message {idx + 1}</CardTitle>
-                    <CardDescription>
-                      Confidence: {(Number(msg.confidence) * 100).toFixed(0)}%
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm whitespace-pre-wrap">{msg.body}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          {generateSequence.error && (
-            <div className="rounded-lg border border-destructive bg-destructive/10 p-4">
-              <p className="text-sm text-destructive">
-                Error: {generateSequence.error.message}
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
   )
 }
