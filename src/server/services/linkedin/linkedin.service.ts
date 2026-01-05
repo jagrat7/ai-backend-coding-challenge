@@ -9,7 +9,7 @@ import {
 import type { ILinkedInService } from "./linkedin.interface";
 
 export class LinkedInService implements ILinkedInService {
-  private extractLinkedInId(url: string): string {
+  extractLinkedInId(url: string): string {
     const patterns = [
       /linkedin\.com\/in\/([^\/\?]+)/,
       /linkedin\.com\/pub\/([^\/\?]+)/,

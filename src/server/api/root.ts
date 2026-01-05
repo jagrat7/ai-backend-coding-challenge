@@ -1,4 +1,3 @@
-import { postRouter } from "~/server/api/routers/post";
 import { linkedinRouter } from "~/server/api/routers/linkedin";
 import { sequenceRouter } from "~/server/api/routers/sequence";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
@@ -9,7 +8,6 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  post: postRouter,
   linkedin: linkedinRouter,
   sequence: sequenceRouter,
 });

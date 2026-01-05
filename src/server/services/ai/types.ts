@@ -1,18 +1,19 @@
-import { z } from "zod";
+import type { InferSelectModel } from "drizzle-orm";
 import type { LinkedInProfile } from "../linkedin/types";
+import type { companies } from "~/server/db/schema";
 
-export interface TovConfig {
+export type TovConfig = {
   formality: number;
   warmth: number;
   directness: number;
-}
+};
 
-export interface Company {
-  name: string;
-  description?: string | null;
-  industry?: string | null;
+export type Company = Pick<
+  InferSelectModel<typeof companies>,
+  "name" | "description" | "industry"
+> & {
   context: string;
-}
+};
 
 export interface GenerateMessagesInput {
   profile: LinkedInProfile;
@@ -21,20 +22,10 @@ export interface GenerateMessagesInput {
   messageCount: number;
 }
 
-export const generatedMessageSchema = z.object({
-  body: z.string(),
-  confidence: z.number().min(0).max(1),
-});
-
-export const generateMessagesOutputSchema = z.object({
-  messages: z.array(generatedMessageSchema),
-  thinkingProcess: z.string(),
-});
-
-export type GeneratedMessage = z.infer<typeof generatedMessageSchema>;
-export type GenerateMessagesOutput = z.infer<
-  typeof generateMessagesOutputSchema
->;
+export interface GeneratedMessage {
+  body: string;
+  confidence: number;
+}
 
 export interface AiGenerationMetadata {
   model: string;
@@ -42,7 +33,6 @@ export interface AiGenerationMetadata {
   completionTokens: number;
   totalTokens: number;
   costUsd: number;
-  latencyMs: number;
 }
 
 export interface GenerateMessagesResult {

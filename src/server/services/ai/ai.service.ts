@@ -1,66 +1,90 @@
-import { generateText, Output } from "ai";
-import { buildSequencePrompt } from "./prompts/sequence.prompt";
+import { generateObject } from "ai";
+import { z } from "zod";
 import {
-  generateMessagesOutputSchema,
-  type GenerateMessagesInput,
-  type GenerateMessagesResult,
-} from "./types";
+  translateTovToInstructions,
+  generateSystemMessage,
+  generateUserMessage,
+} from "./prompts/sequence.prompt";
+import type { GenerateMessagesInput, GenerateMessagesResult } from "./types";
 import type { IAiService } from "./ai.interface";
 
 export class AiService implements IAiService {
-  private readonly MODEL = "google/gemini-2.0-flash-001";
+  private readonly MODEL = "google/gemini-3-flash";
   private readonly COST_PER_MILLION_INPUT = 0.1;
   private readonly COST_PER_MILLION_OUTPUT = 0.4;
+
+  buildTovInstructions(input: GenerateMessagesInput): string {
+    return translateTovToInstructions(input.tovConfig);
+  }
+
+  calculateCost(promptTokens: number, completionTokens: number): number {
+    const inputCost = (promptTokens / 1_000_000) * this.COST_PER_MILLION_INPUT;
+    const outputCost =
+      (completionTokens / 1_000_000) * this.COST_PER_MILLION_OUTPUT;
+    return inputCost + outputCost;
+  }
 
   async generateMessages(
     input: GenerateMessagesInput,
   ): Promise<GenerateMessagesResult> {
-    const startTime = Date.now();
+    const tovInstructions = this.buildTovInstructions(input);
 
-    const prompt = buildSequencePrompt(
-      input.profile,
-      input.company,
-      input.tovConfig,
-      input.messageCount,
-    );
-
-    const result = await generateText({
+    const { object, usage, reasoning } = await generateObject({
       model: this.MODEL,
-      output: Output.object({
-        schema: generateMessagesOutputSchema,
+      schema: z.object({
+        messages: z
+          .array(
+            z.object({
+              body: z
+                .string()
+                .describe(
+                  "The personalized outreach message body, 50-150 words, with clear call-to-action",
+                ),
+              confidence: z
+                .number()
+                .min(0)
+                .max(1)
+                .describe(
+                  "Confidence score (0-1) based on personalization quality and relevance to prospect profile",
+                ),
+            }),
+          )
+          .length(input.messageCount)
+          .describe(
+            `Array of exactly ${input.messageCount} personalized outreach messages for the prospect`,
+          ),
       }),
       providerOptions: {
         google: {
           thinkingConfig: {
+            thinkingLevel: "low",
             includeThoughts: true,
-            thinkingBudget: 4096,
           },
         },
       },
-      prompt,
+      messages: [
+        {
+          role: "system",
+          content: generateSystemMessage(
+            input.profile,
+            input.company,
+            tovInstructions,
+          ),
+        },
+        {
+          role: "user",
+          content: generateUserMessage(input.messageCount),
+        },
+      ],
     });
 
-    const latencyMs = Date.now() - startTime;
-
-    // AI Gateway provides usage metadata
-    const usage = result.usage;
     const promptTokens = usage.inputTokens ?? 0;
     const completionTokens = usage.outputTokens ?? 0;
     const totalTokens = usage.totalTokens ?? 0;
-
     const costUsd = this.calculateCost(promptTokens, completionTokens);
 
-    if (!result.output) {
-      throw new Error("Failed to generate messages - no output returned");
-    }
-
-    // Capture reasoning from Gemini's thinking process
-    const reasoning =
-      result.reasoning?.map((r) => r.text).join("\n") ??
-      result.output.thinkingProcess;
-
     return {
-      messages: result.output.messages,
+      messages: object.messages,
       thinkingProcess: reasoning ?? "",
       metadata: {
         model: this.MODEL,
@@ -68,19 +92,8 @@ export class AiService implements IAiService {
         completionTokens,
         totalTokens,
         costUsd,
-        latencyMs,
       },
     };
-  }
-
-  private calculateCost(
-    promptTokens: number,
-    completionTokens: number,
-  ): number {
-    const inputCost = (promptTokens / 1_000_000) * this.COST_PER_MILLION_INPUT;
-    const outputCost =
-      (completionTokens / 1_000_000) * this.COST_PER_MILLION_OUTPUT;
-    return inputCost + outputCost;
   }
 }
 

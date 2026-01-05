@@ -1,6 +1,7 @@
 import type { ScrapedProfileResult } from "./types";
 
 export interface ILinkedInService {
+  extractLinkedInId(url: string): string;
   scrapeProfile(url: string): Promise<ScrapedProfileResult>;
   getOrCreateProspect(url: string): Promise<{
     id: string;
