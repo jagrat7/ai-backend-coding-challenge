@@ -217,10 +217,11 @@ z.object({
 1. Custom reasoning/thinking step instead of relying on model's internal thinking
 2. Puppeteer/playwright based scraper with docker compose and railway deployment instead of vercel
 3. Better heuristic for message quality
-4. Better service names
-5. Improve sequence abstraction
-6. Better tov storage
-7. Add prompt caching
+4. Add prompt caching
+5. Posthog integration for better token tracking and analytics
+6. Improve sequence abstraction
+7. Better tov storage
 8. Overall refactors
 9. Add users
 10. Additional company config
+11. Better service names
