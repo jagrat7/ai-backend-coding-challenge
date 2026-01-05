@@ -33,5 +33,6 @@ export interface AiGenerationMetadata {
 export interface GenerateMessagesResult {
   messages: GeneratedMessage[];
   thinkingProcess: string;
+  prompt: string;
   metadata: AiGenerationMetadata;
 }

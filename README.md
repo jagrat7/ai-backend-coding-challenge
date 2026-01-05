@@ -63,3 +63,4 @@ erDiagram
 - better tov storage
 - additonal company config
 - improve sqeuence abstraction
+- add users

@@ -49,6 +49,7 @@ export class LinkedInService implements ILinkedInService {
     const data = (await response.json()) as unknown;
     
     // Handle case where API returns an array instead of object
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const profileData = Array.isArray(data) ? data[0] : data;
     
     if (!profileData) {

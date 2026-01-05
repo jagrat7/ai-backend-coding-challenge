@@ -87,7 +87,7 @@ export class SequenceService implements ISequenceService {
     await db.insert(aiGenerations).values({
       sequenceId: sequence.id,
       model: aiResult.metadata.model,
-      prompt: "",
+      prompt: aiResult.prompt,
       tokens_used: aiResult.metadata.totalTokens,
       costUsd: aiResult.metadata.costUsd.toString(),
       thinkingProcess: aiResult.thinkingProcess,
