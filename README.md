@@ -20,7 +20,41 @@ AI-powered tool to generate personalized LinkedIn messaging sequences based on p
 - Confidence scoring for each message
 - Full AI generation tracking (model, tokens, cost, thinking process)
 
-## Database Schema
+
+
+## Getting Started
+
+### Prerequisites
+
+- Bun installed
+
+### Installation
+
+```bash
+# Install dependencies
+bun install
+
+# Set up environment variables
+cp .env.example .env
+
+# Push database schema
+bun run db:push
+
+# Start development server
+bun run dev
+```
+
+### Available Scripts
+
+- `bun run dev` - Start development server with Turbo
+- `bun run build` - Build for production
+- `bun run start` - Start production server
+- `bun run db:push` - Push schema changes to database
+- `bun run db:studio` - Open Drizzle Studio
+
+## Architecture & Design Decisions
+
+### Database Schema Design
 
 ```mermaid
 erDiagram
@@ -86,41 +120,6 @@ erDiagram
         timestamp updatedAt
     }
 ```
-
-## Getting Started
-
-### Prerequisites
-
-- Bun installed
-
-### Installation
-
-```bash
-# Install dependencies
-bun install
-
-# Set up environment variables
-cp .env.example .env
-
-# Push database schema
-bun run db:push
-
-# Start development server
-bun run dev
-```
-
-### Available Scripts
-
-- `bun run dev` - Start development server with Turbo
-- `bun run build` - Build for production
-- `bun run start` - Start production server
-- `bun run db:push` - Push schema changes to database
-- `bun run db:studio` - Open Drizzle Studio
-
-## Architecture & Design Decisions
-
-### Database Schema Design
-
 The schema uses a **normalized structure** with 6 core tables that separate concerns and enable data reusability.
 
 **3NF Compliance**: The schema follows Third Normal Form principles:
