@@ -1,6 +1,4 @@
-import type { InferSelectModel } from "drizzle-orm";
 import type { LinkedInProfile } from "../linkedin/types";
-import type { companies } from "~/server/db/schema";
 
 export type TovConfig = {
   formality: number;
@@ -8,10 +6,7 @@ export type TovConfig = {
   directness: number;
 };
 
-export type Company = Pick<
-  InferSelectModel<typeof companies>,
-  "name" | "description" | "industry"
-> & {
+export type Company = {
   context: string;
 };
 

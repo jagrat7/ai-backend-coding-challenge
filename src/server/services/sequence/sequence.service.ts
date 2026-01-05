@@ -47,10 +47,7 @@ export class SequenceService implements ISequenceService {
     const aiResult = await aiService.generateMessages({
       profile: prospect.profileData as LinkedInProfile,
       company: {
-        name: company.name,
-        description: company.description,
-        industry: company.industry,
-        context: "",
+        context: company.context ?? "",
       },
       tovConfig: {
         formality: Number(tovConfig.formality),

@@ -19,13 +19,7 @@ export const tovConfigs = pgTable("tov_configs", (d) => ({
 
 export const companies = pgTable("companies", (d) => ({
   id: d.uuid().primaryKey().defaultRandom(),
-  prospectId: d
-    .uuid()
-    .notNull()
-    .references(() => prospects.id, { onDelete: "cascade" }),
-  name: d.varchar().notNull(),
-  description: d.text(),
-  industry: d.varchar(),
+  context: d.text(),
   ...timestamps,
 }));
 

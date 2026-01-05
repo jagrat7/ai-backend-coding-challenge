@@ -65,15 +65,11 @@ export class AiService implements IAiService {
       messages: [
         {
           role: "system",
-          content: generateSystemMessage(
-            input.profile,
-            input.company,
-            tovInstructions,
-          ),
+          content: generateSystemMessage(input.company, tovInstructions),
         },
         {
           role: "user",
-          content: generateUserMessage(input.messageCount),
+          content: generateUserMessage(input.profile, input.messageCount),
         },
       ],
     });

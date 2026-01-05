@@ -53,12 +53,39 @@ export function translateTovToInstructions(tov: TovConfig): string {
 }
 
 export function generateSystemMessage(
-  profile: LinkedInProfile,
   company: Company,
   tovInstructions: string,
 ): string {
   return [
     "You are an expert sales copywriter specializing in personalized outreach sequences.",
+    "",
+    "# Requirements",
+    "1. Each message should be personalized based on the prospect's profile",
+    "2. Reference specific details from their experience, education, or skills",
+    "3. Progressive sequence:",
+    "   - Message 1: Initial outreach (introduce value prop)",
+    "   - Message 2+: Follow-up (add social proof, urgency, or different angle)",
+    "   - Final message: Breakup email (polite close, leave door open)",
+    "4. Keep messages concise (50-150 words each)",
+    "5. Include a clear call-to-action in each message",
+    "6. Assign a confidence score (0-1) for each message based on personalization quality",
+    "",
+    "# Company Context",
+    company.context,
+    "",
+    "# Tone of Voice Instructions",
+    tovInstructions,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+export function generateUserMessage(
+  profile: LinkedInProfile,
+  messageCount: number,
+): string {
+  return [
+    `Generate a ${messageCount}-message outreach sequence for this prospect:`,
     "",
     "# Prospect Profile",
     `Name: ${profile.fullName ?? "Unknown"}`,
@@ -102,39 +129,8 @@ export function generateSystemMessage(
           ),
         ].join("\n")
       : "",
-    profile.articles && profile.articles.length > 0
-      ? [
-          "",
-          "Recent Articles:",
-          ...profile.articles.slice(0, 3).map((article) => `- ${article.title}`),
-        ].join("\n")
-      : "",
-    "",
-    "# Company Context",
-    `Company: ${company.name}`,
-    company.description ? `Description: ${company.description}` : "",
-    company.industry ? `Industry: ${company.industry}` : "",
-    `Outreach Context: ${company.context}`,
-    "",
-    "# Tone of Voice Instructions",
-    tovInstructions,
-    "",
-    "# Requirements",
-    "1. Each message should be personalized based on the prospect's profile",
-    "2. Reference specific details from their experience, education, or skills",
-    "3. Progressive sequence:",
-    "   - Message 1: Initial outreach (introduce value prop)",
-    "   - Message 2+: Follow-up (add social proof, urgency, or different angle)",
-    "   - Final message: Breakup email (polite close, leave door open)",
-    "4. Keep messages concise (50-150 words each)",
-    "5. Include a clear call-to-action in each message",
-    "6. Assign a confidence score (0-1) for each message based on personalization quality",
   ]
     .filter(Boolean)
     .join("\n");
-}
-
-export function generateUserMessage(messageCount: number): string {
-  return `Generate a ${messageCount}-message outreach sequence for this prospect.`;
 }
 
